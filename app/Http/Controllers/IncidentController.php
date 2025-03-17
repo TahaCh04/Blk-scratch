@@ -25,7 +25,10 @@ class IncidentController extends Controller
             'status' => 'required|in:en attente,résolu',
         ]);
 
-        Incident::create($request->all());
+        auth()->user()->incidents()->create([
+            'description' => $request->description,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('incidents.index')->with('success', 'Incident ajouté avec succès.');
     }
@@ -42,7 +45,11 @@ class IncidentController extends Controller
             'status' => 'required|in:en attente,résolu',
         ]);
 
-        $incident->update($request->all());
+        $incident->update([
+            'description' => $request->description,
+            'status' => $request->status,
+            
+        ]);
 
         return redirect()->route('incidents.index')->with('success', 'Incident mis à jour.');
     }

@@ -32,6 +32,10 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class);
+    }
 
     /**
      * Get the attributes that should be cast.

@@ -10,5 +10,9 @@ class Incident extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['description', 'status'];
+    protected $fillable = ['description', 'status','user_id'];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

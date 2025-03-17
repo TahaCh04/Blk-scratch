@@ -58,6 +58,21 @@
     .btn-logout:hover {
         background: #800000;
     }
+    .btn-login {
+        display: block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #100ace;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .btn-login:hover {
+        background: #0b0fe5;
+    }
 </style>
 
 <div class="dashboard-container">
@@ -90,6 +105,10 @@
     <form action="{{ route('logout') }}" method="POST">
         @csrf
         <button type="submit" class="btn-logout">Se Déconnecter</button>
+    </form>
+    <form action="{{route('incidents.create')}}">
+    @csrf
+    <button type="submit" class="btn-login">Ajouter</button>
     </form>
 </div>
 
