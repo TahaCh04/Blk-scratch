@@ -112,6 +112,30 @@
         width: 100%;
         bottom: 0;
     }
+    .login-btn {
+        background: #b30000;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .login-btn:hover {
+        background: #800000;
+    }
+    @media (max-width: 768px) {
+        header {
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .header-title {
+            display: none;
+        }
+        .header-logo img {
+            height: 40px;
+        }
+    ¨}
 </style>
 
 <header>
@@ -119,6 +143,7 @@
         <img src="{{ asset('images/logo1.svg') }}" alt="Logo">
     </div>
     <span class="header-title">Système de Déclaration d'Incendies</span>
+    <a href="{{ route('login.show') }}" class="btn btn-primary">Se connecter</a>
 </header>
 
 <main class="main-section">

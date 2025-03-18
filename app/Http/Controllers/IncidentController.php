@@ -7,11 +7,19 @@ use App\Models\Incident;
 
 class IncidentController extends Controller
 {
-    public function index()
-    {
-        $incidents = Incident::all();
-        return view('incidents.index', compact('incidents'));
+    public function index(Request $request)
+{
+    $query = Incident::query();
+
+    if ($request->has('search')) {
+        $query->where('description', 'LIKE', "%{$request->search}%");
     }
+
+    $incidents = $query->paginate(10); // ✅ Remplace get() par paginate(10)
+
+    return view('incidents.index', compact('incidents'));
+}
+
 
     public function create()
     {

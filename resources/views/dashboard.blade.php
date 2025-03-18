@@ -57,18 +57,18 @@
         position: relative;
     }
     .filters {
-        margin-top: 20px;
+        margin-top: 10px;
         display: flex;
         justify-content: space-between;
     }
     .filters select {
-        padding: 8px;
+        padding: 10px;
         font-size: 16px;
         border-radius: 5px;
         border: 1px solid #ccc;
     }
     .chart-container {
-        margin-top: 30px;
+        margin-top: 15px;
         background: white;
         padding: 20px;
         border-radius: 8px;
@@ -171,11 +171,12 @@
             <option value="last_6_months">6 derniers mois</option>
         </select>
 
-        <select id="statusFilter">
-            <option value="all">Tous les statuts</option>
-            <option value="pending">En attente</option>
-            <option value="resolved">Résolus</option>
+        <select id="statusFilter" onchange="applyFilters()">
+            <option value="all" {{ request('status') == 'all' || !request('status') ? 'selected' : '' }}>Tous les statuts</option>
+            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En attente</option>
+            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Résolus</option>
         </select>
+        
     </div>
 
     <!-- Graphique -->
@@ -191,6 +192,7 @@
         var labels = {!! json_encode($mois_labels) !!};
         var signalésData = {!! json_encode($incendies_par_mois) !!};
         var résolusData = {!! json_encode($incendies_resolus_par_mois) !!};
+        var enAttenteData = {!! json_encode($incendies_en_attente_par_mois) !!};
 
         var ctx = document.getElementById('incendiesChart').getContext('2d');
         var incendiesChart = new Chart(ctx, {
@@ -205,6 +207,14 @@
                         borderColor: '#002146',
                         borderWidth: 1,
                         hoverBackgroundColor: 'rgba(0, 61, 128, 1)',
+                    },
+                    {
+                        label: 'Incendies en Attente',
+                        data: enAttenteData,
+                        backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                        borderColor: '#B22222',
+                        borderWidth: 1,
+                        hoverBackgroundColor: 'rgba(255, 0, 0, 1)',
                     },
                     {
                         label: 'Incendies Résolus',
@@ -267,12 +277,21 @@
         });
 
         function applyFilters() {
-            let year = document.getElementById("yearFilter").value;
-            let time = document.getElementById("timeFilter").value;
-            let status = document.getElementById("statusFilter").value;
+    let year = document.getElementById("yearFilter").value;
+    let time = document.getElementById("timeFilter").value;
+    let status = document.getElementById("statusFilter").value;
 
-            window.location.href = `?year=${year}&time=${time}&status=${status}`;
-        }
+    // Si "Tous les statuts" est sélectionné, on force "all" dans l'URL
+    let url = `?year=${year}&time=${time}`;
+    
+    if (status !== "all") {
+        url += `&status=${status}`;
+    }
+
+    window.location.href = url;
+}
+
+
     });
 </script>
 @endsection

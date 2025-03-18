@@ -14,6 +14,7 @@ class DashboardController extends Controller
     {
         $total_incendies = Incident::count();
         $incendies_resolus = Incident::where('status', 'résolu')->count();
+        $incendies_en_attente = Incident::where('status', 'en attente');
         $total_users = User::count();
 
         // Années disponibles pour les filtres
@@ -46,10 +47,33 @@ class DashboardController extends Controller
             $query_signalés->whereBetween('created_at', [Carbon::now()->subMonths(6), Carbon::now()]);
             $query_resolus->whereBetween('created_at', [Carbon::now()->subMonths(6), Carbon::now()]);
         }
-
+        if ($status === 'all') {
+            // Ne pas filtrer les incidents et afficher tout
+            $incendies_par_mois = Incident::selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
+                ->groupBy('mois')
+                ->orderBy('mois')
+                ->pluck('total', 'mois')
+                ->toArray();
+        
+            $incendies_resolus_par_mois = Incident::where('status', 'résolu')
+                ->selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
+                ->groupBy('mois')
+                ->orderBy('mois')
+                ->pluck('total', 'mois')
+                ->toArray();
+        
+            $incendies_en_attente_par_mois = Incident::where('status', 'en attente')
+                ->selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
+                ->groupBy('mois')
+                ->orderBy('mois')
+                ->pluck('total', 'mois')
+                ->toArray();
+        }
+        
         // Générer les statistiques après filtres
         $incendies_par_mois = array_fill(0, 12, 0);
         $incendies_resolus_par_mois = array_fill(0, 12, 0);
+        $incendies_en_attente_par_mois = array_fill(0, 12, 0);
 
         $incidents_signalés = $query_signalés->selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
             ->groupBy('mois')
@@ -62,7 +86,13 @@ class DashboardController extends Controller
             ->orderBy('mois', 'asc')
             ->pluck('total', 'mois')
             ->toArray();
-
+        
+        $incendies_en_attente = $incendies_en_attente->selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
+        ->groupBy('mois')
+        ->orderBy('mois', 'asc')
+        ->pluck('total', 'mois')
+        ->toArray();
+    
         foreach ($incidents_signalés as $mois => $total) {
             $incendies_par_mois[$mois - 1] = $total;
         }
@@ -71,13 +101,28 @@ class DashboardController extends Controller
             $incendies_resolus_par_mois[$mois - 1] = $total;
         }
 
+        foreach ($incendies_en_attente as $mois => $total) {
+            $incendies_en_attente_par_mois[$mois - 1] = $total;
+        }  
         // Vérifier si on affiche uniquement les résolus
         if ($status === 'resolved') {
-            $incendies_par_mois = array_fill(0, 12, 0); // Cache les incidents non résolus
+            $incendies_par_mois = array_fill(0, 12, 0); // Cache les incidents signalés
+            $incendies_en_attente_par_mois = array_fill(0, 12, 0); // Cache les incidents en attente
         } elseif ($status === 'pending') {
+            $incendies_par_mois = array_fill(0, 12, 0); // Cache les incidents signalés
             $incendies_resolus_par_mois = array_fill(0, 12, 0); // Cache les incidents résolus
+        } elseif ($status === 'all') {
+            // Affiche tous les incidents sans modifications
         }
 
-        return view('dashboard', compact('total_incendies', 'incendies_resolus', 'total_users', 'incendies_par_mois', 'incendies_resolus_par_mois', 'available_years', 'mois_labels'));
+        return view('dashboard', compact(
+            'total_incendies', 
+            'incendies_resolus', 
+            'total_users', 
+            'incendies_par_mois', 
+            'incendies_resolus_par_mois', 
+            'incendies_en_attente_par_mois',
+            'available_years', 
+            'mois_labels'));
     }
 }
