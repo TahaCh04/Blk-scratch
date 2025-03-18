@@ -111,6 +111,19 @@
     .logout-btn:hover {
         background: #800000;
     }
+    .stats-container {
+         display: flex;
+         justify-content: space-between;
+         margin-top: 20px;
+     }
+     .stat-box {
+         background: white;
+         padding: 10px;
+         border-radius: 8px;
+         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+         text-align: center;
+         width: 30%;
+     }
     @media (max-width: 768px) {
         header {
             flex-direction: row;
@@ -149,13 +162,28 @@
     <a href="{{ route('dashboard') }}">Tableau de Bord</a>
     <a href="{{ route('incidents.index') }}">Gestion des Incendies</a>
     <a href="#">Utilisateurs</a>
+    <a href="#">Exporter</a>
     <a href="#">Paramètres</a>
 </nav>
 <div class="dashboard-container">
     <div class="header">
         Bienvenue, {{ auth()->user()->name }} 
     </div>
-
+    <!-- Statistiques -->
+    <div class="stats-container">
+        <div class="stat-box">
+            <h3>Incendies Signalés</h3>
+            <p><strong>{{ $total_incendies }}</strong></p>
+        </div>
+        <div class="stat-box">
+            <h3>Incendies Résolus</h3>
+            <p><strong>{{ $incendies_resolus }}</strong></p>
+        </div>
+        <div class="stat-box">
+            <h3>Utilisateurs Inscrits</h3>
+            <p><strong>{{ $total_users }}</strong></p>
+        </div>
+    </div>
     <!-- Filtres -->
     <div class="filters">
         <select id="yearFilter">

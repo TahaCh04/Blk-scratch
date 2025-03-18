@@ -33,23 +33,25 @@ class AuthController extends Controller
     }
 
     public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+        'role' => 'user', // Par défaut, les nouveaux utilisateurs sont "user"
+    ]);
 
-        Auth::login($user);
+    Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Inscription réussie.');
-    }
+    return redirect()->route('dashboard');
+}
+
 
     public function logout()
     {

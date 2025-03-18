@@ -254,22 +254,35 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($incidents as $incident)
+            @forelse ($incidents as $incident)
             <tr>
                 <td>{{ $incident->id }}</td>
                 <td>{{ $incident->description }}</td>
-                <td><span style="color: {{ $incident->status == 'résolu' ? 'green' : 'red' }}; font-weight: bold;">{{ ucfirst($incident->status) }}</span></td>
-                <td class="actions">
-                    <button class="btn btn-edit" onclick="openEditModal({{ $incident->id }}, '{{ $incident->description }}', '{{ $incident->status }}')">Modifier</button>
-                    <form action="{{ route('incidents.destroy', $incident) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet incendie ?');" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-delete">Supprimer</button>
-                    </form>
+                <td>
+                    <span style="color: {{ $incident->status == 'résolu' ? 'green' : 'red' }};">
+                        {{ ucfirst($incident->status) }}
+                    </span>
                 </td>
+                <td class="actions">
+                    @if(auth()->user()->role === 'admin' || auth()->id() === $incident->user_id)
+                        <button class="btn btn-edit" onclick="openEditModal({{ $incident->id }}, '{{ $incident->description }}', '{{ $incident->status }}')">Modifier</button>
+                            <form action="{{ route('incidents.destroy', $incident) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet incident ?');" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-delete">Supprimer</button>
+                            </form>
+                    @endif
+                </td>
+               
+                
             </tr>
-            @endforeach
+            @empty
+            <tr>
+                <td colspan="4">Aucun incident trouvé.</td>
+            </tr>
+            @endforelse
         </tbody>
+        
     </table>
     {{ $incidents->links() }}
 </div>
